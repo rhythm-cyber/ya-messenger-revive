@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'trebuchet': ['Trebuchet MS', 'sans-serif'],
+				'verdana': ['Verdana', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -26,7 +30,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -61,7 +66,25 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				yahoo: {
+					purple: 'hsl(var(--yahoo-purple))',
+					blue: 'hsl(var(--yahoo-blue))',
+					yellow: 'hsl(var(--yahoo-yellow))',
+					green: 'hsl(var(--yahoo-green))',
+					orange: 'hsl(var(--yahoo-orange))',
+				},
+				status: {
+					online: 'hsl(var(--online-status))',
+					away: 'hsl(var(--away-status))',
+					busy: 'hsl(var(--busy-status))',
+					offline: 'hsl(var(--offline-status))',
 				}
+			},
+			boxShadow: {
+				'chat': 'var(--shadow-chat)',
+				'buddy': 'var(--shadow-buddy)',
+				'button': 'var(--shadow-button)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

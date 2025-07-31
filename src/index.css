@@ -1,42 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Trebuchet+MS:wght@400;700&family=Verdana:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Yahoo Messenger Nostalgic Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Yahoo Messenger Classic Colors */
+    --background: 240 15% 95%;
+    --foreground: 240 20% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 240 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 20% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Yahoo Purple Theme */
+    --primary: 270 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 270 70% 65%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Yahoo Blue Accent */
+    --secondary: 220 80% 55%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Yahoo Yellow/Gold */
+    --accent: 45 95% 60%;
+    --accent-foreground: 240 20% 15%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 240 10% 90%;
+    --muted-foreground: 240 15% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 15% 85%;
+    --input: 240 10% 92%;
+    --ring: 270 60% 45%;
 
-    --radius: 0.5rem;
+    /* Yahoo Messenger Specific Colors */
+    --yahoo-purple: 270 60% 45%;
+    --yahoo-blue: 220 80% 55%;
+    --yahoo-yellow: 45 95% 60%;
+    --yahoo-green: 120 60% 50%;
+    --yahoo-orange: 25 85% 60%;
+    --online-status: 120 65% 45%;
+    --away-status: 45 85% 55%;
+    --busy-status: 0 70% 50%;
+    --offline-status: 0 0% 65%;
+
+    /* Chat Bubble Colors */
+    --bubble-sent: 270 55% 85%;
+    --bubble-received: 220 40% 90%;
+    --bubble-system: 45 70% 85%;
+
+    /* Gradients */
+    --gradient-yahoo: linear-gradient(135deg, hsl(var(--yahoo-purple)), hsl(var(--yahoo-blue)));
+    --gradient-chat: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-header: linear-gradient(90deg, hsl(var(--yahoo-purple)), hsl(var(--yahoo-blue)), hsl(var(--yahoo-yellow)));
+
+    /* Shadows */
+    --shadow-chat: 0 4px 20px -2px hsl(var(--yahoo-purple) / 0.2);
+    --shadow-buddy: 0 2px 10px -1px hsl(var(--yahoo-blue) / 0.3);
+    --shadow-button: 0 2px 8px -1px hsl(var(--yahoo-purple) / 0.4);
+
+    --radius: 8px;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +131,105 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-trebuchet;
+  }
+}
+
+@layer components {
+  /* Yahoo Messenger Chat Bubbles */
+  .chat-bubble {
+    @apply rounded-lg px-3 py-2 max-w-xs break-words shadow-sm;
+  }
+
+  .chat-bubble-sent {
+    @apply chat-bubble bg-[hsl(var(--bubble-sent))] text-primary ml-auto;
+  }
+
+  .chat-bubble-received {
+    @apply chat-bubble bg-[hsl(var(--bubble-received))] text-foreground;
+  }
+
+  .chat-bubble-system {
+    @apply chat-bubble bg-[hsl(var(--bubble-system))] text-muted-foreground text-center mx-auto text-sm;
+  }
+
+  /* Yahoo Status Indicators */
+  .status-online {
+    @apply bg-[hsl(var(--online-status))] w-3 h-3 rounded-full border-2 border-white;
+  }
+
+  .status-away {
+    @apply bg-[hsl(var(--away-status))] w-3 h-3 rounded-full border-2 border-white;
+  }
+
+  .status-busy {
+    @apply bg-[hsl(var(--busy-status))] w-3 h-3 rounded-full border-2 border-white;
+  }
+
+  .status-offline {
+    @apply bg-[hsl(var(--offline-status))] w-3 h-3 rounded-full border-2 border-white;
+  }
+
+  /* Yahoo Gradients */
+  .gradient-yahoo {
+    background: var(--gradient-yahoo);
+  }
+
+  .gradient-chat {
+    background: var(--gradient-chat);
+  }
+
+  .gradient-header {
+    background: var(--gradient-header);
+  }
+
+  /* Custom Animations */
+  .typing-indicator {
+    @apply flex space-x-1;
+  }
+
+  .typing-dot {
+    @apply w-2 h-2 bg-muted-foreground rounded-full animate-pulse;
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  .typing-dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  /* Yahoo-style scrollbar */
+  .yahoo-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--yahoo-purple)) hsl(var(--muted));
+  }
+
+  .yahoo-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .yahoo-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  .yahoo-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--yahoo-purple));
+    border-radius: 4px;
+  }
+
+  .yahoo-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-glow));
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
   }
 }
