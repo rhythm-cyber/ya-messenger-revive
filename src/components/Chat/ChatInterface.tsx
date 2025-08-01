@@ -73,7 +73,7 @@ const ChatInterface: React.FC = () => {
   };
 
   const currentRoomMessages = messages.filter(msg => 
-    msg.roomId === currentRoom?.id
+    msg.room_id === currentRoom?.id
   );
 
   const currentTypingUsers = currentRoom ? typingUsers[currentRoom.id] || [] : [];
@@ -100,7 +100,7 @@ const ChatInterface: React.FC = () => {
           <div>
             <CardTitle className="text-lg">{currentRoom.name}</CardTitle>
             <p className="text-sm text-white/80">
-              {currentRoom.participantCount} participants
+              {currentRoom.member_count || 0} participants
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -122,7 +122,7 @@ const ChatInterface: React.FC = () => {
               <MessageBubble
                 key={message.id}
                 message={message}
-                isOwnMessage={message.senderId === user?.id}
+                isOwnMessage={message.sender_id === user?.id}
               />
             ))}
             

@@ -1,54 +1,95 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'react-hot-toast';
 
-export interface User {
+export interface Profile {
   id: string;
   username: string;
-  email: string;
-  avatar?: string;
-  status: 'online' | 'away' | 'busy' | 'offline';
-  lastSeen?: Date;
+  display_name?: string;
+  avatar_url?: string;
+  status: 'online' | 'away' | 'busy' | 'invisible' | 'offline';
+  last_seen?: string;
+  bio?: string;
+  email?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
+  profile: Profile | null;
+  session: Session | null;
   login: (email: string, password: string) => Promise<boolean>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  updateStatus: (status: User['status']) => void;
+  updateStatus: (status: Profile['status']) => void;
   updateAvatar: (avatar: string) => void;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Configure axios defaults
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-axios.defaults.baseURL = API_BASE_URL;
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchUserProfile();
-    } else {
-      setIsLoading(false);
-    }
-  }, [token]);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Fetch user profile when authenticated
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          setProfile(null);
+        }
+      }
+    );
 
-  const fetchUserProfile = async () => {
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
     try {
-      const response = await axios.get('/auth/profile');
-      setUser(response.data);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Failed to fetch user profile:', error);
+      } else if (data) {
+        setProfile({ 
+          ...data, 
+          email: user?.email,
+          status: data.status as Profile['status'] || 'offline'
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
-      logout();
     } finally {
       setIsLoading(false);
     }
@@ -57,19 +98,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await axios.post('/auth/login', { email, password });
-      const { token: newToken, user: userData } = response.data;
-      
-      setToken(newToken);
-      setUser(userData);
-      localStorage.setItem('token', newToken);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-      
-      toast.success(`Welcome back, ${userData.username}!`);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return false;
+      }
+
+      toast.success('Welcome back!');
       return true;
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      toast.error('Login failed');
       return false;
     } finally {
       setIsLoading(false);
@@ -79,50 +121,100 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await axios.post('/auth/register', { username, email, password });
-      const { token: newToken, user: userData } = response.data;
+      const redirectUrl = `${window.location.origin}/`;
       
-      setToken(newToken);
-      setUser(userData);
-      localStorage.setItem('token', newToken);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-      
-      toast.success(`Welcome to Yahoo Messenger, ${userData.username}!`);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            username,
+            display_name: username,
+          }
+        }
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return false;
+      }
+
+      toast.success(`Welcome to Yahoo Messenger, ${username}!`);
       return true;
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Registration failed';
-      toast.error(message);
+      toast.error('Registration failed');
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+  const logout = async () => {
+    await supabase.auth.signOut();
     toast.success('Logged out successfully');
   };
 
-  const updateStatus = async (status: User['status']) => {
+  const updateStatus = async (status: Profile['status']) => {
+    if (!user?.id) return;
+    
     try {
-      await axios.patch('/auth/status', { status });
-      setUser(prev => prev ? { ...prev, status } : null);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ status })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Failed to update status:', error);
+      } else {
+        setProfile(prev => prev ? { ...prev, status } : null);
+      }
     } catch (error) {
       console.error('Failed to update status:', error);
     }
   };
 
   const updateAvatar = async (avatar: string) => {
+    if (!user?.id) return;
+    
     try {
-      await axios.patch('/auth/avatar', { avatar });
-      setUser(prev => prev ? { ...prev, avatar } : null);
-      toast.success('Avatar updated successfully');
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatar })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Failed to update avatar:', error);
+        toast.error('Failed to update avatar');
+      } else {
+        setProfile(prev => prev ? { ...prev, avatar_url: avatar } : null);
+        toast.success('Avatar updated successfully');
+      }
     } catch (error) {
       console.error('Failed to update avatar:', error);
       toast.error('Failed to update avatar');
+    }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Failed to update profile:', error);
+        toast.error('Failed to update profile');
+      } else {
+        setProfile(prev => prev ? { ...prev, ...updates } : null);
+        toast.success('Profile updated successfully');
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error('Failed to update profile');
     }
   };
 
@@ -130,12 +222,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        token,
+        profile,
+        session,
         login,
         register,
         logout,
         updateStatus,
         updateAvatar,
+        updateProfile,
         isLoading,
       }}
     >

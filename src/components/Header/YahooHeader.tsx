@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 const YahooHeader: React.FC = () => {
-  const { user, logout, updateStatus } = useAuth();
+  const { user, profile, logout, updateStatus } = useAuth();
   const { isConnected } = useSocket();
 
   const getStatusIcon = (status: string) => {
@@ -78,21 +78,21 @@ const YahooHeader: React.FC = () => {
           </Badge>
 
           {/* User Menu */}
-          {user && (
+          {user && profile && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-white hover:bg-white/10 space-x-2">
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={user.avatar} />
+                    <AvatarImage src={profile.avatar_url || ''} />
                     <AvatarFallback className="bg-white/20 text-white">
-                      {user.username.charAt(0).toUpperCase()}
+                      {profile.username.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-medium">{user.username}</span>
+                    <span className="text-sm font-medium">{profile.display_name || profile.username}</span>
                     <div className="flex items-center space-x-1">
-                      {getStatusIcon(user.status)}
-                      <span className="text-xs">{getStatusText(user.status)}</span>
+                      {getStatusIcon(profile.status)}
+                      <span className="text-xs">{getStatusText(profile.status)}</span>
                     </div>
                   </div>
                 </Button>

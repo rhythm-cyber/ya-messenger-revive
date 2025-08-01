@@ -25,8 +25,8 @@ const RoomList: React.FC = () => {
   const categorizeRooms = () => {
     const categories = {
       main: rooms.filter(room => room.type === 'public' && ['Main Lobby', 'India', 'Global'].includes(room.name)),
-      states: rooms.filter(room => room.type === 'state'),
-      languages: rooms.filter(room => room.type === 'language'),
+      states: rooms.filter(room => room.category === 'state'),
+      languages: rooms.filter(room => room.category === 'language'),
       custom: rooms.filter(room => room.type === 'private' || 
         (room.type === 'public' && !['Main Lobby', 'India', 'Global'].includes(room.name)))
     };
@@ -53,7 +53,7 @@ const RoomList: React.FC = () => {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
           <span className="truncate">{room.name}</span>
-          <span className="text-xs ml-2">{room.participantCount}</span>
+          <span className="text-xs ml-2">{room.member_count || 0}</span>
         </div>
       </div>
     </Button>
