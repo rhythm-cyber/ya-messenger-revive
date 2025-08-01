@@ -61,7 +61,7 @@ const YahooHeader: React.FC = () => {
         {/* Yahoo Messenger Logo */}
         <div className="flex items-center space-x-4">
           <div className="text-white">
-            <h1 className="text-2xl font-bold">Yahoo! Messenger</h1>
+            <h1 className="text-2xl font-bold">Tittoo! Messenger</h1>
             <p className="text-sm text-white/80">Classic Chat Experience</p>
           </div>
         </div>
