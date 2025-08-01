@@ -46,12 +46,15 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/yahoo-messenger', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('📁 Connected to MongoDB'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+const { createClient } = require('@supabase/supabase-js');
+
+
+// Initialize Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
 
 // Routes
 app.use('/api/auth', authRoutes);
