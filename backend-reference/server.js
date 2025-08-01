@@ -56,6 +56,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/messages', messageRoutes);
 
+// ✅ Root route for browser check
+app.get('/', (req, res) => {
+  res.send('🟢 Tittoo Messenger backend is running!');
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ 
