@@ -142,7 +142,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setMessages(prev => [...prev, messageWithSender]);
             
             // Play notification sound if message is not from current user
-            if (newMessage.sender_id !== user.id) {
+            if (newMessage.sender_id !== user?.id) {
               playNotificationSound();
               toast(`New message from ${senderData?.display_name || senderData?.username}`, { icon: '💬' });
             }
