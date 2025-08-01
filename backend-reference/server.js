@@ -46,7 +46,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Database connection
-const { createClient } = require('@supabase/supabase.js');
+const { createClient } = require('@supabase/supabaseClient.js');
 
 // Initialize Supabase
 const supabase = createClient(
