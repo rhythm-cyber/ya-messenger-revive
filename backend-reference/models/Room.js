@@ -1,167 +1,58 @@
-const mongoose = require('mongoose');
+// supabase/roomService.js
+const { supabase } = require('../supabaseClient');
 
-const roomSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 50
-  },
-  description: {
-    type: String,
-    maxlength: 200,
-    default: ''
-  },
-  type: {
-    type: String,
-    enum: ['public', 'private', 'state', 'language'],
-    default: 'public'
-  },
-  category: {
-    type: String,
-    enum: ['main', 'states', 'languages', 'custom'],
-    default: 'custom'
-  },
-  avatar: {
-    type: String,
-    default: null
-  },
-  participants: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    joinedAt: {
-      type: Date,
-      default: Date.now
-    },
-    role: {
-      type: String,
-      enum: ['member', 'moderator', 'admin'],
-      default: 'member'
-    },
-    isOnline: {
-      type: Boolean,
-      default: false
-    }
-  }],
-  creator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  admins: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  moderators: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  settings: {
-    isPrivate: {
-      type: Boolean,
-      default: false
-    },
-    requireApproval: {
-      type: Boolean,
-      default: false
-    },
-    maxParticipants: {
-      type: Number,
-      default: 1000
-    },
-    allowFileUpload: {
-      type: Boolean,
-      default: true
-    },
-    allowEmojis: {
-      type: Boolean,
-      default: true
-    }
-  },
-  lastActivity: {
-    type: Date,
-    default: Date.now
-  },
-  messageCount: {
-    type: Number,
-    default: 0
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
+// Fetch a room by name
+async function getRoomByName(name) {
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .eq('name', name)
+    .single();
 
-// Index for efficient queries
-roomSchema.index({ type: 1, category: 1 });
-roomSchema.index({ name: 1 });
-roomSchema.index({ 'participants.user': 1 });
+  if (error) throw error;
+  return data;
+}
 
-// Virtual for participant count
-roomSchema.virtual('participantCount').get(function() {
-  return this.participants.length;
-});
+// Create a new room
+async function createRoom({ name, description, type = 'public', category = 'custom', avatar = null, creator, settings = {} }) {
+  const { data, error } = await supabase
+    .from('rooms')
+    .insert([{
+      name,
+      description,
+      type,
+      category,
+      avatar,
+      creator,
+      settings
+    }])
+    .select()
+    .single();
 
-// Virtual for online participant count
-roomSchema.virtual('onlineParticipantCount').get(function() {
-  return this.participants.filter(p => p.isOnline).length;
-});
+  if (error) throw error;
+  return data;
+}
 
-// Add participant method
-roomSchema.methods.addParticipant = function(userId, role = 'member') {
-  const existingParticipant = this.participants.find(p => p.user.equals(userId));
-  if (!existingParticipant) {
-    this.participants.push({ user: userId, role });
-    return this.save();
-  }
-  return Promise.resolve(this);
-};
+// Update room activity timestamp
+async function updateRoomActivity(roomId) {
+  const { error } = await supabase
+    .from('rooms')
+    .update({ last_activity: new Date().toISOString() })
+    .eq('id', roomId);
 
-// Remove participant method
-roomSchema.methods.removeParticipant = function(userId) {
-  this.participants = this.participants.filter(p => !p.user.equals(userId));
-  return this.save();
-};
-
-// Update participant online status
-roomSchema.methods.updateParticipantStatus = function(userId, isOnline) {
-  const participant = this.participants.find(p => p.user.equals(userId));
-  if (participant) {
-    participant.isOnline = isOnline;
-    return this.save();
-  }
-  return Promise.resolve(this);
-};
-
-// Check if user is participant
-roomSchema.methods.isParticipant = function(userId) {
-  return this.participants.some(p => p.user.equals(userId));
-};
-
-// Check if user is admin
-roomSchema.methods.isAdmin = function(userId) {
-  return this.admins.includes(userId) || this.creator.equals(userId);
-};
-
-// Check if user is moderator
-roomSchema.methods.isModerator = function(userId) {
-  return this.moderators.includes(userId) || this.isAdmin(userId);
-};
-
-// Update last activity
-roomSchema.methods.updateActivity = function() {
-  this.lastActivity = new Date();
-  return this.save();
-};
+  if (error) throw error;
+}
 
 // Increment message count
-roomSchema.methods.incrementMessageCount = function() {
-  this.messageCount += 1;
-  return this.save();
-};
+async function incrementMessageCount(roomId) {
+  const { data, error } = await supabase.rpc('increment_message_count', { room_id: roomId });
+  if (error) throw error;
+  return data;
+}
 
-module.exports = mongoose.model('Room', roomSchema);
+module.exports = {
+  getRoomByName,
+  createRoom,
+  updateRoomActivity,
+  incrementMessageCount
+};

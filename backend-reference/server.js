@@ -1,20 +1,11 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
-
-// Load .env file
-
-const express = require('express');
-const http = require('http');
-const { supabase } = require('./supabaseClient');
-// ...rest of the code
-
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -23,6 +14,13 @@ const messageRoutes = require('./routes/messages');
 
 // Import socket handlers
 const setupSocketHandlers = require('./socket/socketHandlers');
+
+// Supabase
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // Initialize Express app
 const app = express();
@@ -48,28 +46,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
-
-// Database connection
-const { createClient } = require('@supabase/supabase-js');
-
-
-// Initialize Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
@@ -78,10 +65,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Setup Socket.IO handlers
+// Socket handlers
 setupSocketHandlers(io);
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
