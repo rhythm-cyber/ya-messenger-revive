@@ -58,7 +58,7 @@ app.use('/api/messages', messageRoutes);
 
 // ✅ Root route for browser check
 app.get('/', (req, res) => {
-  res.send('🟢 Tittoo Messenger backend is running!');
+  res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
 });
 
 // Health check
