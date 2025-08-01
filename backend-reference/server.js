@@ -8,6 +8,14 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// Load .env file
+
+const express = require('express');
+const http = require('http');
+const { supabase } = require('./supabaseClient');
+// ...rest of the code
+
+
 // Import routes
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
