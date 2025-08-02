@@ -26,7 +26,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   return (
     <Card className="w-full max-w-md shadow-chat">
       <CardHeader className="text-center gradient-yahoo text-white rounded-t-lg">
-        <CardTitle className="text-2xl font-bold">Yahoo Messenger</CardTitle>
+        <CardTitle className="text-2xl font-bold">Tittoos Messenger</CardTitle>
         <CardDescription className="text-white/90">
           Welcome back! Sign in to your account
         </CardDescription>

@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
+import PrivateChat from '@/components/Chat/PrivateChat';
 import { 
   Users, 
   ChevronDown, 
@@ -24,6 +25,7 @@ const BuddyList: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(['online', 'away', 'busy'])
   );
+  const [privateChatWith, setPrivateChatWith] = useState<any>(null);
 
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -79,7 +81,10 @@ const BuddyList: React.FC = () => {
   };
 
   const UserItem: React.FC<{ user: any }> = ({ user: buddyUser }) => (
-    <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+    <div 
+      className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+      onClick={() => setPrivateChatWith(buddyUser)}
+    >
       <div className="relative">
         <Avatar className="w-8 h-8">
           <AvatarImage src={buddyUser.avatar} />
@@ -103,9 +108,9 @@ const BuddyList: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => {
-            // TODO: Implement private chat
-            console.log('Start private chat with:', buddyUser.username);
+          onClick={(e) => {
+            e.stopPropagation();
+            setPrivateChatWith(buddyUser);
           }}
           className="opacity-0 group-hover:opacity-100 transition-opacity"
         >
@@ -148,70 +153,79 @@ const BuddyList: React.FC = () => {
   );
 
   return (
-    <Card className="w-80 shadow-buddy">
-      <CardHeader className="gradient-yahoo text-white">
-        <CardTitle className="text-lg flex items-center justify-between">
-          <div className="flex items-center">
-            <Users className="h-5 w-5 mr-2" />
-            Buddy List
-          </div>
-          <div className="flex items-center space-x-1">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <UserPlus className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        <ScrollArea className="h-96 yahoo-scrollbar">
-          <div className="space-y-2">
-            {online.length > 0 && (
-              <CategorySection
-                title="Online"
-                icon={<Circle className="h-4 w-4 text-status-online fill-current" />}
-                category="online"
-                users={online}
-              />
-            )}
+    <>
+      <Card className="w-80 lg:w-80 md:w-72 sm:w-64 shadow-buddy">
+        <CardHeader className="gradient-yahoo text-white">
+          <CardTitle className="text-lg flex items-center justify-between">
+            <div className="flex items-center">
+              <Users className="h-5 w-5 mr-2" />
+              Buddy List
+            </div>
+            <div className="flex items-center space-x-1">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+                <UserPlus className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <ScrollArea className="h-96 yahoo-scrollbar">
+            <div className="space-y-2">
+              {online.length > 0 && (
+                <CategorySection
+                  title="Online"
+                  icon={<Circle className="h-4 w-4 text-status-online fill-current" />}
+                  category="online"
+                  users={online}
+                />
+              )}
 
-            {away.length > 0 && (
-              <CategorySection
-                title="Away"
-                icon={<Clock className="h-4 w-4 text-status-away" />}
-                category="away"
-                users={away}
-              />
-            )}
+              {away.length > 0 && (
+                <CategorySection
+                  title="Away"
+                  icon={<Clock className="h-4 w-4 text-status-away" />}
+                  category="away"
+                  users={away}
+                />
+              )}
 
-            {busy.length > 0 && (
-              <CategorySection
-                title="Busy"
-                icon={<Minus className="h-4 w-4 text-status-busy" />}
-                category="busy"
-                users={busy}
-              />
-            )}
+              {busy.length > 0 && (
+                <CategorySection
+                  title="Busy"
+                  icon={<Minus className="h-4 w-4 text-status-busy" />}
+                  category="busy"
+                  users={busy}
+                />
+              )}
 
-            {offline.length > 0 && (
-              <CategorySection
-                title="Offline"
-                icon={<XCircle className="h-4 w-4 text-status-offline" />}
-                category="offline"
-                users={offline}
-              />
-            )}
+              {offline.length > 0 && (
+                <CategorySection
+                  title="Offline"
+                  icon={<XCircle className="h-4 w-4 text-status-offline" />}
+                  category="offline"
+                  users={offline}
+                />
+              )}
 
-            {online.length === 0 && away.length === 0 && busy.length === 0 && offline.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                <Users className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">No buddies online</p>
-                <p className="text-xs">Add friends to see them here</p>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+              {online.length === 0 && away.length === 0 && busy.length === 0 && offline.length === 0 && (
+                <div className="text-center text-muted-foreground py-8">
+                  <Users className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-sm">No buddies online</p>
+                  <p className="text-xs">Add friends to see them here</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+      
+      {privateChatWith && (
+        <PrivateChat 
+          recipient={privateChatWith} 
+          onClose={() => setPrivateChatWith(null)} 
+        />
+      )}
+    </>
   );
 };
 

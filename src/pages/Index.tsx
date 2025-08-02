@@ -11,7 +11,7 @@ const Index = () => {
       <div className="min-h-screen gradient-yahoo flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <h2 className="text-xl font-bold">Loading Yahoo Messenger...</h2>
+          <h2 className="text-xl font-bold">Loading Tittoos Messenger...</h2>
         </div>
       </div>
     );
