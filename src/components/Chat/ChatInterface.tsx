@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, Smile, Settings, Users } from 'lucide-react';
+import { Send, Smile, Settings, Users, Mic, MicOff } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import EmojiPicker from 'emoji-picker-react';
@@ -23,8 +23,11 @@ const ChatInterface: React.FC = () => {
   } = useSocket();
   const [messageInput, setMessageInput] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     scrollToBottom();
@@ -70,6 +73,40 @@ const ChatInterface: React.FC = () => {
   const handleEmojiSelect = (emojiData: any) => {
     setMessageInput(prev => prev + emojiData.emoji);
     setShowEmojiPicker(false);
+  };
+
+  const startVoiceRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        // TODO: Send voice message
+        console.log('Voice recording ready:', audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting voice recording:', error);
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
   };
 
   const currentRoomMessages = messages.filter(msg => 
@@ -157,6 +194,15 @@ const ChatInterface: React.FC = () => {
             onKeyPress={handleKeyPress}
             className="flex-1"
           />
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+            className={`${isRecording ? 'bg-destructive text-white' : ''}`}
+          >
+            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
           
           <Button 
             onClick={handleSendMessage}

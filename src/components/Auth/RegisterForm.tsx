@@ -34,7 +34,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) => {
   return (
     <Card className="w-full max-w-md shadow-chat">
       <CardHeader className="text-center gradient-yahoo text-white rounded-t-lg">
-        <CardTitle className="text-2xl font-bold">Join Yahoo Messenger</CardTitle>
+        <CardTitle className="text-2xl font-bold">Join Tittoos Messenger</CardTitle>
         <CardDescription className="text-white/90">
           Create your account and start chatting
         </CardDescription>

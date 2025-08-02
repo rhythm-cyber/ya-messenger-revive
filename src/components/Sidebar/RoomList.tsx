@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useSocket } from '@/contexts/SocketContext';
+import CreateRoomDialog from '@/components/Chat/CreateRoomDialog';
 import { ChevronDown, ChevronRight, Hash, Globe, MapPin, Languages } from 'lucide-react';
 
 const RoomList: React.FC = () => {
@@ -97,6 +98,7 @@ const RoomList: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
+        <CreateRoomDialog />
         <ScrollArea className="h-96 yahoo-scrollbar">
           <div className="space-y-2">
             {main.length > 0 && (
