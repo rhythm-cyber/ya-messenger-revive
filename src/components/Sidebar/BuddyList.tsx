@@ -19,7 +19,11 @@ import {
   XCircle
 } from 'lucide-react';
 
-const BuddyList: React.FC = () => {
+interface BuddyListProps {
+  onOpenPrivateChat?: (recipient: any) => void;
+}
+
+const BuddyList: React.FC<BuddyListProps> = ({ onOpenPrivateChat }) => {
   const { user } = useAuth();
   const { onlineUsers, sendPrivateMessage } = useSocket();
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -80,10 +84,18 @@ const BuddyList: React.FC = () => {
     }
   };
 
+  const handleUserClick = (buddyUser: any) => {
+    if (onOpenPrivateChat) {
+      onOpenPrivateChat(buddyUser);
+    } else {
+      setPrivateChatWith(buddyUser);
+    }
+  };
+
   const UserItem: React.FC<{ user: any }> = ({ user: buddyUser }) => (
     <div 
       className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-      onClick={() => setPrivateChatWith(buddyUser)}
+      onClick={() => handleUserClick(buddyUser)}
     >
       <div className="relative">
         <Avatar className="w-8 h-8">
@@ -110,7 +122,7 @@ const BuddyList: React.FC = () => {
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            setPrivateChatWith(buddyUser);
+            handleUserClick(buddyUser);
           }}
           className="opacity-0 group-hover:opacity-100 transition-opacity"
         >
@@ -219,7 +231,7 @@ const BuddyList: React.FC = () => {
         </CardContent>
       </Card>
       
-      {privateChatWith && (
+      {privateChatWith && !onOpenPrivateChat && (
         <PrivateChat 
           recipient={privateChatWith} 
           onClose={() => setPrivateChatWith(null)} 

@@ -1,10 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import YahooHeader from '@/components/Header/YahooHeader';
 import RoomList from '@/components/Sidebar/RoomList';
 import BuddyList from '@/components/Sidebar/BuddyList';
 import ChatInterface from '@/components/Chat/ChatInterface';
+import PrivateChat from '@/components/Chat/PrivateChat';
+import { useSocket } from '@/contexts/SocketContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MainLayout: React.FC = () => {
+  const { user } = useAuth();
+  const { messages } = useSocket();
+  const [activePrivateChats, setActivePrivateChats] = useState<Set<string>>(new Set());
+  const [privateRecipients, setPrivateRecipients] = useState<Map<string, any>>(new Map());
+
+  // Auto-open private chat when receiving new private message
+  useEffect(() => {
+    const privateMessages = messages.filter(msg => 
+      msg.receiver_id === user?.id && msg.sender_id !== user?.id
+    );
+    
+    if (privateMessages.length > 0) {
+      const latestMessage = privateMessages[privateMessages.length - 1];
+      if (latestMessage.sender && !activePrivateChats.has(latestMessage.sender_id)) {
+        setActivePrivateChats(prev => new Set([...prev, latestMessage.sender_id]));
+        setPrivateRecipients(prev => new Map([...prev, [latestMessage.sender_id, latestMessage.sender]]));
+      }
+    }
+  }, [messages, user?.id, activePrivateChats]);
+
+  const handleOpenPrivateChat = (recipient: any) => {
+    setActivePrivateChats(prev => new Set([...prev, recipient.id]));
+    setPrivateRecipients(prev => new Map([...prev, [recipient.id, recipient]]));
+  };
+
+  const handleClosePrivateChat = (recipientId: string) => {
+    setActivePrivateChats(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(recipientId);
+      return newSet;
+    });
+    setPrivateRecipients(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(recipientId);
+      return newMap;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <YahooHeader />
@@ -18,7 +59,7 @@ const MainLayout: React.FC = () => {
                 <RoomList />
               </div>
               <div className="w-full">
-                <BuddyList />
+                <BuddyList onOpenPrivateChat={handleOpenPrivateChat} />
               </div>
             </div>
           </div>
@@ -35,10 +76,22 @@ const MainLayout: React.FC = () => {
           
           {/* Desktop: Right Sidebar - Buddy List */}
           <div className="hidden lg:block">
-            <BuddyList />
+            <BuddyList onOpenPrivateChat={handleOpenPrivateChat} />
           </div>
         </div>
       </main>
+
+      {/* Private Chat Windows */}
+      {Array.from(activePrivateChats).map(recipientId => {
+        const recipient = privateRecipients.get(recipientId);
+        return recipient ? (
+          <PrivateChat
+            key={recipientId}
+            recipient={recipient}
+            onClose={() => handleClosePrivateChat(recipientId)}
+          />
+        ) : null;
+      })}
     </div>
   );
 };
