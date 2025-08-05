@@ -8,66 +8,78 @@
 
 @layer base {
   :root {
-    /* Yahoo Messenger Classic Colors */
-    --background: 240 15% 95%;
-    --foreground: 240 20% 15%;
+    /* Classic 90s Yahoo Chat Colors */
+    --background: 0 0% 75%; /* Classic grey background */
+    --foreground: 0 0% 0%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 20% 15%;
+    --card: 0 0% 85%; /* Light grey for windows */
+    --card-foreground: 0 0% 0%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 20% 15%;
+    --popover: 0 0% 85%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Yahoo Purple Theme */
-    --primary: 270 60% 45%;
+    /* Classic blue */
+    --primary: 240 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 270 70% 65%;
+    --primary-glow: 240 100% 70%;
 
-    /* Yahoo Blue Accent */
-    --secondary: 220 80% 55%;
-    --secondary-foreground: 0 0% 100%;
+    /* Button grey */
+    --secondary: 0 0% 80%;
+    --secondary-foreground: 0 0% 0%;
 
-    /* Yahoo Yellow/Gold */
-    --accent: 45 95% 60%;
-    --accent-foreground: 240 20% 15%;
+    /* Pressed button grey */
+    --accent: 0 0% 70%;
+    --accent-foreground: 0 0% 0%;
 
-    --muted: 240 10% 90%;
-    --muted-foreground: 240 15% 45%;
+    --muted: 0 0% 90%; /* Light grey */
+    --muted-foreground: 0 0% 25%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 15% 85%;
-    --input: 240 10% 92%;
-    --ring: 270 60% 45%;
+    --border: 0 0% 50%; /* Dark grey borders */
+    --input: 0 0% 100%; /* White input fields */
+    --ring: 240 100% 50%;
 
-    /* Yahoo Messenger Specific Colors */
-    --yahoo-purple: 270 60% 45%;
-    --yahoo-blue: 220 80% 55%;
-    --yahoo-yellow: 45 95% 60%;
-    --yahoo-green: 120 60% 50%;
-    --yahoo-orange: 25 85% 60%;
-    --online-status: 120 65% 45%;
-    --away-status: 45 85% 55%;
-    --busy-status: 0 70% 50%;
-    --offline-status: 0 0% 65%;
+    /* 90s Yahoo specific colors */
+    --yahoo-purple: 300 100% 25%; /* Dark purple */
+    --yahoo-purple-light: 300 50% 50%;
+    --yahoo-blue: 240 100% 50%; /* Classic blue */
+    --yahoo-yellow: 48 96% 53%;
+    --yahoo-orange: 25 95% 53%;
+    --yahoo-red: 0 84% 60%;
 
-    /* Chat Bubble Colors */
-    --bubble-sent: 270 55% 85%;
-    --bubble-received: 220 40% 90%;
-    --bubble-system: 45 70% 85%;
+    /* Status colors */
+    --online-status: 120 100% 25%; /* Classic green */
+    --away-status: 48 96% 53%;
+    --busy-status: 0 84% 60%;
+    --offline-status: 0 0% 50%; /* Grey */
+
+    /* Chat bubble colors */
+    --bubble-sent: 240 100% 90%; /* Light blue */
+    --bubble-received: 0 0% 95%; /* Very light grey */
+    --bubble-system: 48 96% 95%; /* Light yellow */
+
+    /* Window chrome colors */
+    --window-chrome: 0 0% 75%; /* Standard grey */
+    --window-border-dark: 0 0% 25%; /* Dark border */
+    --window-border-light: 0 0% 95%; /* Light border */
+    --button-face: 0 0% 75%; /* Button face */
+    --button-shadow: 0 0% 25%; /* Button shadow */
+    --button-highlight: 0 0% 95%; /* Button highlight */
 
     /* Gradients */
     --gradient-yahoo: linear-gradient(135deg, hsl(var(--yahoo-purple)), hsl(var(--yahoo-blue)));
-    --gradient-chat: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-chat: linear-gradient(180deg, hsl(var(--window-chrome)), hsl(var(--window-chrome)));
     --gradient-header: linear-gradient(90deg, hsl(var(--yahoo-purple)), hsl(var(--yahoo-blue)), hsl(var(--yahoo-yellow)));
 
     /* Shadows */
-    --shadow-chat: 0 4px 20px -2px hsl(var(--yahoo-purple) / 0.2);
-    --shadow-buddy: 0 2px 10px -1px hsl(var(--yahoo-blue) / 0.3);
-    --shadow-button: 0 2px 8px -1px hsl(var(--yahoo-purple) / 0.4);
+    --shadow-chat: inset 1px 1px 0 hsl(var(--window-border-light)), inset -1px -1px 0 hsl(var(--window-border-dark));
+    --shadow-buddy: inset 1px 1px 0 hsl(var(--window-border-light)), inset -1px -1px 0 hsl(var(--window-border-dark));
+    --shadow-button: inset 1px 1px 0 hsl(var(--button-highlight)), inset -1px -1px 0 hsl(var(--button-shadow));
+    --shadow-button-pressed: inset -1px -1px 0 hsl(var(--button-highlight)), inset 1px 1px 0 hsl(var(--button-shadow));
 
-    --radius: 8px;
+    --radius: 0rem; /* No rounded corners for 90s look */
 
     --sidebar-background: 0 0% 98%;
 
@@ -136,21 +148,57 @@
 }
 
 @layer components {
-  /* Yahoo Messenger Chat Bubbles */
+  /* Chat bubble styles - 90s style */
   .chat-bubble {
-    @apply rounded-lg px-3 py-2 max-w-xs break-words shadow-sm;
+    @apply p-2 max-w-xs word-wrap border;
+    background: hsl(var(--bubble-received));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-button);
   }
 
   .chat-bubble-sent {
-    @apply chat-bubble bg-[hsl(var(--bubble-sent))] text-primary ml-auto;
+    @apply ml-auto;
+    background: hsl(var(--bubble-sent));
+    color: hsl(var(--foreground));
   }
 
   .chat-bubble-received {
-    @apply chat-bubble bg-[hsl(var(--bubble-received))] text-foreground;
+    background: hsl(var(--bubble-received));
+    color: hsl(var(--foreground));
   }
 
   .chat-bubble-system {
-    @apply chat-bubble bg-[hsl(var(--bubble-system))] text-muted-foreground text-center mx-auto text-sm;
+    @apply text-center italic text-sm mx-auto;
+    background: hsl(var(--bubble-system));
+    color: hsl(var(--foreground));
+  }
+
+  /* 90s Window chrome styles */
+  .window-chrome {
+    background: hsl(var(--window-chrome));
+    border: 2px outset hsl(var(--window-chrome));
+    box-shadow: var(--shadow-chat);
+  }
+
+  .window-inset {
+    border: 2px inset hsl(var(--window-chrome));
+    background: hsl(var(--input));
+  }
+
+  .button-90s {
+    background: hsl(var(--button-face));
+    border: 2px outset hsl(var(--button-face));
+    box-shadow: var(--shadow-button);
+    @apply px-3 py-1 text-sm;
+  }
+
+  .button-90s:hover {
+    background: hsl(var(--accent));
+  }
+
+  .button-90s:active {
+    border: 2px inset hsl(var(--button-face));
+    box-shadow: var(--shadow-button-pressed);
   }
 
   /* Yahoo Status Indicators */

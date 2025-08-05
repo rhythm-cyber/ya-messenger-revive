@@ -166,61 +166,108 @@ const BuddyList: React.FC<BuddyListProps> = ({ onOpenPrivateChat }) => {
 
   return (
     <>
-      <Card className="w-80 lg:w-80 md:w-72 sm:w-64 shadow-buddy">
-        <CardHeader className="gradient-yahoo text-white">
-          <CardTitle className="text-lg flex items-center justify-between">
-            <div className="flex items-center">
-              <Users className="h-5 w-5 mr-2" />
-              Buddy List
-            </div>
-            <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-                <UserPlus className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <ScrollArea className="h-96 yahoo-scrollbar">
-            <div className="space-y-2">
-              {online.length > 0 && (
-                <CategorySection
-                  title="Online"
-                  icon={<Circle className="h-4 w-4 text-status-online fill-current" />}
-                  category="online"
-                  users={online}
-                />
-              )}
-
+      <div className="w-80 lg:w-80 md:w-72 sm:w-64 shadow-buddy window-chrome">
+        {/* Title bar */}
+        <div className="bg-gray-300 border-b border-gray-500 px-2 py-1">
+          <span className="text-xs font-bold">Yahoo! Messenger</span>
+        </div>
+        
+        <div className="window-inset m-1 flex-1">
+          <ScrollArea className="h-96 yahoo-scrollbar bg-white">
+            <div className="p-1">
+              {/* Online users */}
+              <div className="mb-2">
+                <div className="bg-gray-200 px-2 py-1 border-b border-gray-400">
+                  <span className="text-xs font-bold">Online ({online.length})</span>
+                </div>
+                {online.map((buddyUser) => (
+                  <div
+                    key={buddyUser.id}
+                    onClick={() => handleUserClick(buddyUser)}
+                    className="flex items-center space-x-2 p-1 hover:bg-blue-100 cursor-pointer border-b border-gray-100"
+                  >
+                    <div className="relative">
+                      <Avatar className="w-6 h-6">
+                        <AvatarImage src={buddyUser.avatar_url} />
+                        <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                          {buddyUser.username.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-0 -right-0 w-2 h-2 bg-green-500 rounded-full border border-white" />
+                    </div>
+                    <div className="flex-1 truncate">
+                      <p className="text-xs font-medium truncate text-blue-600">
+                        {buddyUser.username}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Away users */}
               {away.length > 0 && (
-                <CategorySection
-                  title="Away"
-                  icon={<Clock className="h-4 w-4 text-status-away" />}
-                  category="away"
-                  users={away}
-                />
+                <div className="mb-2">
+                  <div className="bg-gray-200 px-2 py-1 border-b border-gray-400">
+                    <span className="text-xs font-bold">Away ({away.length})</span>
+                  </div>
+                  {away.map((buddyUser) => (
+                    <div
+                      key={buddyUser.id}
+                      onClick={() => handleUserClick(buddyUser)}
+                      className="flex items-center space-x-2 p-1 hover:bg-blue-100 cursor-pointer border-b border-gray-100"
+                    >
+                      <div className="relative">
+                        <Avatar className="w-6 h-6">
+                           <AvatarImage src={buddyUser.avatar_url} />
+                          <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                            {buddyUser.username.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-0 -right-0 w-2 h-2 bg-yellow-500 rounded-full border border-white" />
+                      </div>
+                      <div className="flex-1 truncate">
+                        <p className="text-xs font-medium truncate text-blue-600">
+                          {buddyUser.username}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
-              {busy.length > 0 && (
-                <CategorySection
-                  title="Busy"
-                  icon={<Minus className="h-4 w-4 text-status-busy" />}
-                  category="busy"
-                  users={busy}
-                />
-              )}
-
+              {/* Offline users */}
               {offline.length > 0 && (
-                <CategorySection
-                  title="Offline"
-                  icon={<XCircle className="h-4 w-4 text-status-offline" />}
-                  category="offline"
-                  users={offline}
-                />
+                <div>
+                  <div className="bg-gray-200 px-2 py-1 border-b border-gray-400">
+                    <span className="text-xs font-bold">Offline ({offline.length})</span>
+                  </div>
+                  {offline.map((buddyUser) => (
+                    <div
+                      key={buddyUser.id}
+                      onClick={() => handleUserClick(buddyUser)}
+                      className="flex items-center space-x-2 p-1 hover:bg-blue-100 cursor-pointer border-b border-gray-100 opacity-60"
+                    >
+                      <div className="relative">
+                        <Avatar className="w-6 h-6">
+                           <AvatarImage src={buddyUser.avatar_url} />
+                          <AvatarFallback className="text-xs bg-muted text-muted-foreground">
+                            {buddyUser.username.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-0 -right-0 w-2 h-2 bg-gray-500 rounded-full border border-white" />
+                      </div>
+                      <div className="flex-1 truncate">
+                        <p className="text-xs font-medium truncate text-gray-600">
+                          {buddyUser.username}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
               {online.length === 0 && away.length === 0 && busy.length === 0 && offline.length === 0 && (
-                <div className="text-center text-muted-foreground py-8">
+                <div className="text-center text-gray-500 py-8">
                   <Users className="h-8 w-8 mx-auto mb-2" />
                   <p className="text-sm">No buddies online</p>
                   <p className="text-xs">Add friends to see them here</p>
@@ -228,8 +275,8 @@ const BuddyList: React.FC<BuddyListProps> = ({ onOpenPrivateChat }) => {
               )}
             </div>
           </ScrollArea>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       
       {privateChatWith && !onOpenPrivateChat && (
         <PrivateChat 

@@ -90,56 +90,85 @@ const RoomList: React.FC = () => {
   );
 
   return (
-    <Card className="w-80 shadow-buddy">
-      <CardHeader className="gradient-yahoo text-white">
-        <CardTitle className="text-lg flex items-center">
-          <Hash className="h-5 w-5 mr-2" />
-          Chat Rooms
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
+    <div className="w-80 shadow-buddy window-chrome">
+      {/* Title bar */}
+      <div className="bg-gray-300 border-b border-gray-500 px-2 py-1 flex items-center justify-between">
+        <span className="text-xs font-bold">Chat Rooms</span>
         <CreateRoomDialog />
-        <ScrollArea className="h-96 yahoo-scrollbar">
-          <div className="space-y-2">
+      </div>
+      
+      <div className="window-inset m-1 flex-1">
+        <ScrollArea className="h-96 yahoo-scrollbar bg-white">
+          <div className="p-2">
             {main.length > 0 && (
-              <CategorySection
-                title="Main Rooms"
-                icon={<Globe className="h-4 w-4" />}
-                category="main"
-                rooms={main}
-              />
-            )}
-
-            {states.length > 0 && (
-              <CategorySection
-                title="Indian States"
-                icon={<MapPin className="h-4 w-4" />}
-                category="states"
-                rooms={states}
-              />
-            )}
-
-            {languages.length > 0 && (
-              <CategorySection
-                title="Language Rooms"
-                icon={<Languages className="h-4 w-4" />}
-                category="languages"
-                rooms={languages}
-              />
+              <div className="mb-2">
+                <div className="bg-gray-200 px-2 py-1 border-b border-gray-400">
+                  <span className="text-xs font-bold">Main Rooms</span>
+                </div>
+                {main.map((room) => (
+                  <div
+                    key={room.id}
+                    onClick={() => {
+                      if (currentRoom?.id === room.id) {
+                        leaveRoom(room.id);
+                      } else {
+                        joinRoom(room.id);
+                      }
+                    }}
+                    className={`p-2 cursor-pointer border-b border-gray-200 hover:bg-blue-100 ${
+                      currentRoom?.id === room.id ? 'bg-blue-200' : ''
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 text-blue-600">#</div>
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-blue-600">{room.name}</div>
+                        <div className="text-xs text-gray-600">
+                          {room.member_count || 0} users
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
 
             {custom.length > 0 && (
-              <CategorySection
-                title="Custom Rooms"
-                icon={<Hash className="h-4 w-4" />}
-                category="custom"
-                rooms={custom}
-              />
+              <div className="mb-2">
+                <div className="bg-gray-200 px-2 py-1 border-b border-gray-400">
+                  <span className="text-xs font-bold">Custom Rooms</span>
+                </div>
+                {custom.map((room) => (
+                  <div
+                    key={room.id}
+                    onClick={() => {
+                      if (currentRoom?.id === room.id) {
+                        leaveRoom(room.id);
+                      } else {
+                        joinRoom(room.id);
+                      }
+                    }}
+                    className={`p-2 cursor-pointer border-b border-gray-200 hover:bg-blue-100 ${
+                      currentRoom?.id === room.id ? 'bg-blue-200' : ''
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 text-blue-600">#</div>
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-blue-600">{room.name}</div>
+                        <div className="text-xs text-gray-600">
+                          {room.member_count || 0} users
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

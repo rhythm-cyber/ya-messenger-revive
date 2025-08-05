@@ -130,31 +130,34 @@ const ChatInterface: React.FC = () => {
   }
 
   return (
-    <Card className="flex-1 flex flex-col h-full shadow-chat">
-      {/* Chat Header */}
-      <CardHeader className="border-b gradient-yahoo text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">{currentRoom.name}</CardTitle>
-            <p className="text-sm text-white/80">
-              {currentRoom.member_count || 0} participants
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <Users className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
+    <div className="flex-1 flex flex-col h-full window-chrome">
+      {/* Title bar */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-1 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-bold">Yahoo! Chat - {currentRoom.name}</span>
         </div>
-      </CardHeader>
+        <div className="flex space-x-1">
+          <button className="w-4 h-4 bg-gray-300 border border-gray-500 text-xs">_</button>
+          <button className="w-4 h-4 bg-gray-300 border border-gray-500 text-xs">□</button>
+          <button className="w-4 h-4 bg-red-500 border border-gray-500 text-xs">×</button>
+        </div>
+      </div>
+      
+      {/* Menu bar */}
+      <div className="bg-gray-200 border-b border-gray-400 px-2 py-1">
+        <div className="flex space-x-4 text-xs">
+          <span className="hover:bg-gray-300 px-2 py-1">File</span>
+          <span className="hover:bg-gray-300 px-2 py-1">Edit</span>
+          <span className="hover:bg-gray-300 px-2 py-1">View</span>
+          <span className="hover:bg-gray-300 px-2 py-1">People</span>
+          <span className="hover:bg-gray-300 px-2 py-1">Help</span>
+        </div>
+      </div>
 
-      {/* Messages Area */}
-      <CardContent className="flex-1 p-0">
-        <ScrollArea className="h-full p-4 yahoo-scrollbar">
-          <div className="space-y-4">
+      {/* Chat area */}
+      <div className="flex-1 window-inset m-2">
+        <ScrollArea className="h-full p-2 yahoo-scrollbar bg-white">
+          <div className="space-y-2">
             {currentRoomMessages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -171,49 +174,58 @@ const ChatInterface: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
-      </CardContent>
+      </div>
 
-      {/* Message Input */}
-      <div className="border-t p-4">
-        <div className="flex items-center space-x-2">
-          <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <Smile className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" side="top">
-              <EmojiPicker onEmojiClick={handleEmojiSelect} />
-            </PopoverContent>
-          </Popover>
-          
-          <Input
-            placeholder={`Message ${currentRoom.name}...`}
-            value={messageInput}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            className="flex-1"
-          />
-          
-          <Button
-            variant="ghost"
-            size="sm"
+      {/* Input area */}
+      <div className="m-2 bg-gray-200 border-2 inset border-gray-400 p-2">
+        <div className="flex items-center space-x-2 mb-2">
+          <button className="button-90s text-xs">Bold</button>
+          <button className="button-90s text-xs">Italic</button>
+          <button className="button-90s text-xs">Color</button>
+          <button 
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="button-90s text-xs"
+          >
+            😀
+          </button>
+          <div className="flex-1"></div>
+          <button 
             onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-            className={`${isRecording ? 'bg-destructive text-white' : ''}`}
+            className={`button-90s text-xs ${isRecording ? 'bg-red-300' : ''}`}
           >
-            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          </Button>
-          
-          <Button 
-            onClick={handleSendMessage}
+            🎤
+          </button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={messageInput}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Type a message..."
+              className="w-full px-2 py-1 border-2 inset border-gray-400 bg-white text-sm"
+            />
+            {showEmojiPicker && (
+              <div className="absolute bottom-full mb-2 right-0 z-50">
+                <EmojiPicker
+                  onEmojiClick={handleEmojiSelect}
+                  width={300}
+                  height={400}
+                />
+              </div>
+            )}
+          </div>
+          <button 
+            onClick={handleSendMessage} 
             disabled={!messageInput.trim()}
-            className="shadow-button"
+            className="button-90s text-xs px-4"
           >
-            <Send className="h-4 w-4" />
-          </Button>
+            Send
+          </button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

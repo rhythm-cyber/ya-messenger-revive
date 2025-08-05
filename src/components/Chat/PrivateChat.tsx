@@ -114,41 +114,47 @@ const PrivateChat: React.FC<PrivateChatProps> = ({ recipient, onClose }) => {
   };
 
   return (
-    <Card className="fixed bottom-4 right-4 w-80 h-96 shadow-chat z-50 bg-background">
-      <CardHeader className="gradient-yahoo text-white p-3">
-        <CardTitle className="text-sm flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Avatar className="w-6 h-6">
-              <AvatarImage src={recipient.avatar} />
-              <AvatarFallback className="text-xs">
-                {recipient.username.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="truncate">{recipient.username}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleCall}
-              className="text-white hover:bg-white/10 p-1 h-6 w-6"
-            >
-              {isInCall ? <PhoneOff className="h-3 w-3" /> : <Phone className="h-3 w-3" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/10 p-1 h-6 w-6"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
+    <div className="fixed bottom-4 right-4 w-80 h-96 shadow-lg z-50 window-chrome">
+      {/* Title bar */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-1 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-xs font-bold">Private Message - {recipient.username}</span>
+        </div>
+        <div className="flex space-x-1">
+          <button className="w-3 h-3 bg-gray-300 border border-gray-500 text-xs">_</button>
+          <button 
+            onClick={onClose}
+            className="w-3 h-3 bg-red-500 border border-gray-500 text-xs"
+          >
+            ×
+          </button>
+        </div>
+      </div>
       
-      <CardContent className="p-0 h-full flex flex-col">
-        <ScrollArea ref={scrollAreaRef} className="flex-1 p-3 yahoo-scrollbar">
+      {/* User info bar */}
+      <div className="bg-gray-200 border-b border-gray-400 px-2 py-1 flex items-center space-x-2">
+        <Avatar className="w-6 h-6">
+          <AvatarImage src={recipient.avatar} />
+          <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+            {recipient.username.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <span className="text-xs">{recipient.username}</span>
+        <span className={`text-xs ${recipient.status === 'online' ? 'text-green-600' : 'text-gray-500'}`}>
+          {recipient.status === 'online' ? '● Online' : '○ Offline'}
+        </span>
+        <div className="flex-1"></div>
+        <button
+          onClick={toggleCall}
+          className={`button-90s text-xs ${isInCall ? 'bg-green-300' : ''}`}
+        >
+          📞
+        </button>
+      </div>
+      
+      {/* Messages area */}
+      <div className="flex-1 window-inset m-1">
+        <ScrollArea ref={scrollAreaRef} className="h-full p-2 bg-white yahoo-scrollbar">
           <div className="space-y-2">
             {privateMessages.map((msg) => (
               <MessageBubble
@@ -163,36 +169,35 @@ const PrivateChat: React.FC<PrivateChatProps> = ({ recipient, onClose }) => {
             )}
           </div>
         </ScrollArea>
-        
-        <div className="p-3 border-t border-border">
-          <div className="flex space-x-2">
-            <Input
-              value={message}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Type a message..."
-              className="flex-1 text-sm"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-              className={`p-2 ${isRecording ? 'bg-destructive text-white' : ''}`}
-            >
-              {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-            </Button>
-            <Button
-              onClick={handleSendMessage}
-              disabled={!message.trim()}
-              size="sm"
-              className="p-2"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
+      </div>
+      
+      {/* Input area */}
+      <div className="m-1 bg-gray-200 border-2 inset border-gray-400 p-1">
+        <div className="flex items-center space-x-1">
+          <input
+            type="text"
+            value={message}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder="Type a message..."
+            className="flex-1 px-2 py-1 border-2 inset border-gray-400 bg-white text-xs"
+          />
+          <button
+            onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+            className={`button-90s text-xs ${isRecording ? 'bg-red-300 animate-pulse' : ''}`}
+          >
+            🎤
+          </button>
+          <button 
+            onClick={handleSendMessage} 
+            disabled={!message.trim()}
+            className="button-90s text-xs"
+          >
+            Send
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
