@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Send, Smile, Settings, Users, Mic, MicOff } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
-import EmojiPicker from 'emoji-picker-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Users } from 'lucide-react';
 
 const ChatInterface: React.FC = () => {
   const { user } = useAuth();
@@ -22,12 +19,8 @@ const ChatInterface: React.FC = () => {
     stopTyping 
   } = useSocket();
   const [messageInput, setMessageInput] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     scrollToBottom();
@@ -58,54 +51,13 @@ const ChatInterface: React.FC = () => {
     if (currentRoom) {
       startTyping(currentRoom.id);
       
-      // Clear existing timeout
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
       
-      // Set new timeout to stop typing
       typingTimeoutRef.current = setTimeout(() => {
         stopTyping(currentRoom.id);
       }, 2000);
-    }
-  };
-
-  const handleEmojiSelect = (emojiData: any) => {
-    setMessageInput(prev => prev + emojiData.emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const startVoiceRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        // TODO: Send voice message
-        console.log('Voice recording ready:', audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error starting voice recording:', error);
-    }
-  };
-
-  const stopVoiceRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
     }
   };
 
@@ -117,103 +69,68 @@ const ChatInterface: React.FC = () => {
 
   if (!currentRoom) {
     return (
-      <Card className="flex-1 flex items-center justify-center">
-        <CardContent>
-          <div className="text-center text-muted-foreground">
-            <Users className="h-12 w-12 mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Select a room to start chatting</h3>
-            <p>Choose a room from the sidebar to join the conversation</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex-1 flex items-center justify-center bg-white border border-gray-300">
+        <div className="text-center text-gray-500">
+          <Users className="h-12 w-12 mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Select a room to start chatting</h3>
+          <p>Choose a room from the sidebar to join the conversation</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="flex-1 flex flex-col h-full shadow-chat">
-      {/* Chat Header */}
-      <CardHeader className="border-b gradient-yahoo text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">{currentRoom.name}</CardTitle>
-            <p className="text-sm text-white/80">
-              {currentRoom.member_count || 0} participants
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <Users className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
+    <div className="flex-1 flex flex-col h-full bg-white border border-gray-300">
+      {/* Toolbar */}
+      <div className="bg-gray-100 border-b border-gray-300 px-2 py-1 text-xs">
+        <Button variant="ghost" size="sm" className="text-xs">PM</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Add</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Options</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Voice</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Chat</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Refresh</Button>
+        <Button variant="ghost" size="sm" className="text-xs">Shield</Button>
+      </div>
 
       {/* Messages Area */}
-      <CardContent className="flex-1 p-0">
-        <ScrollArea className="h-full p-4 yahoo-scrollbar">
-          <div className="space-y-4">
-            {currentRoomMessages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isOwnMessage={message.sender_id === user?.id}
-              />
-            ))}
-            
-            {/* Typing Indicator */}
-            {currentTypingUsers.length > 0 && (
-              <TypingIndicator users={currentTypingUsers} />
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-      </CardContent>
+      <ScrollArea className="flex-1 p-2">
+        <div className="space-y-1">
+          {currentRoomMessages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isOwnMessage={message.sender_id === user?.id}
+            />
+          ))}
+
+          {currentTypingUsers.length > 0 && (
+            <TypingIndicator users={currentTypingUsers} />
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
 
       {/* Message Input */}
-      <div className="border-t p-4">
+      <div className="border-t border-gray-300 p-2">
         <div className="flex items-center space-x-2">
-          <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <Smile className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" side="top">
-              <EmojiPicker onEmojiClick={handleEmojiSelect} />
-            </PopoverContent>
-          </Popover>
-          
           <Input
-            placeholder={`Message ${currentRoom.name}...`}
+            placeholder={`Message #${currentRoom.name}`}
             value={messageInput}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
-            className="flex-1"
+            className="flex-1 rounded-sm"
           />
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-            className={`${isRecording ? 'bg-destructive text-white' : ''}`}
-          >
-            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          </Button>
-          
           <Button 
             onClick={handleSendMessage}
             disabled={!messageInput.trim()}
-            className="shadow-button"
+            className="rounded-sm"
           >
-            <Send className="h-4 w-4" />
+            Send
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

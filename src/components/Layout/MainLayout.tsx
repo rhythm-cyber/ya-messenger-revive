@@ -47,36 +47,24 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-100 font-sans">
       <YahooHeader />
       
-      <main className="max-w-7xl mx-auto p-2 md:p-4">
-        <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 h-[calc(100vh-140px)]">
-          {/* Mobile: Combined sidebars */}
-          <div className="lg:hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="w-full">
-                <RoomList />
-              </div>
-              <div className="w-full">
-                <BuddyList onOpenPrivateChat={handleOpenPrivateChat} />
-              </div>
-            </div>
-          </div>
-          
-          {/* Desktop: Left Sidebar - Rooms */}
-          <div className="hidden lg:block">
+      <main className="max-w-screen-2xl mx-auto p-2 h-[calc(100vh-120px)]">
+        <div className="flex space-x-2 h-full">
+          {/* Left Sidebar - Rooms */}
+          <div className="w-48 hidden lg:block">
             <RoomList />
           </div>
           
           {/* Main Chat Area */}
-          <div className="flex-1 min-h-0">
-            <ChatInterface />
-          </div>
-          
-          {/* Desktop: Right Sidebar - Buddy List */}
-          <div className="hidden lg:block">
-            <BuddyList onOpenPrivateChat={handleOpenPrivateChat} />
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex min-h-0">
+              <ChatInterface />
+              <div className="w-48 hidden lg:block ml-2">
+                <BuddyList onOpenPrivateChat={handleOpenPrivateChat} />
+              </div>
+            </div>
           </div>
         </div>
       </main>
