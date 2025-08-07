@@ -169,7 +169,7 @@ const BuddyList: React.FC<BuddyListProps> = ({ onOpenPrivateChat }) => {
       <div className="w-80 lg:w-80 md:w-72 sm:w-64 shadow-buddy window-chrome">
         {/* Title bar */}
         <div className="bg-gray-300 border-b border-gray-500 px-2 py-1">
-          <span className="text-xs font-bold">Yahoo! Messenger</span>
+          <span className="text-xs font-bold">Tittoo Chat</span>
         </div>
         
         <div className="window-inset m-1 flex-1">

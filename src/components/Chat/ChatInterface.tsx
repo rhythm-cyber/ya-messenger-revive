@@ -134,7 +134,7 @@ const ChatInterface: React.FC = () => {
       {/* Title bar */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-1 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-bold">Yahoo! Chat - {currentRoom.name}</span>
+          <span className="text-sm font-bold">Tittoo Chat - {currentRoom.name}</span>
         </div>
         <div className="flex space-x-1">
           <button className="w-4 h-4 bg-gray-300 border border-gray-500 text-xs">_</button>
@@ -146,11 +146,45 @@ const ChatInterface: React.FC = () => {
       {/* Menu bar */}
       <div className="bg-gray-200 border-b border-gray-400 px-2 py-1">
         <div className="flex space-x-4 text-xs">
-          <span className="hover:bg-gray-300 px-2 py-1">File</span>
-          <span className="hover:bg-gray-300 px-2 py-1">Edit</span>
-          <span className="hover:bg-gray-300 px-2 py-1">View</span>
-          <span className="hover:bg-gray-300 px-2 py-1">People</span>
-          <span className="hover:bg-gray-300 px-2 py-1">Help</span>
+          <div className="relative group">
+            <span className="hover:bg-gray-300 px-2 py-1 cursor-pointer">File</span>
+            <div className="absolute top-full left-0 bg-white border border-gray-400 shadow-lg hidden group-hover:block z-50 min-w-32">
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">New Room</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Join Room</div>
+              <div className="border-t border-gray-300"></div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Exit</div>
+            </div>
+          </div>
+          <div className="relative group">
+            <span className="hover:bg-gray-300 px-2 py-1 cursor-pointer">Edit</span>
+            <div className="absolute top-full left-0 bg-white border border-gray-400 shadow-lg hidden group-hover:block z-50 min-w-32">
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Copy</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Paste</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Select All</div>
+            </div>
+          </div>
+          <div className="relative group">
+            <span className="hover:bg-gray-300 px-2 py-1 cursor-pointer">View</span>
+            <div className="absolute top-full left-0 bg-white border border-gray-400 shadow-lg hidden group-hover:block z-50 min-w-32">
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Refresh</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Font Size</div>
+            </div>
+          </div>
+          <div className="relative group">
+            <span className="hover:bg-gray-300 px-2 py-1 cursor-pointer">People</span>
+            <div className="absolute top-full left-0 bg-white border border-gray-400 shadow-lg hidden group-hover:block z-50 min-w-32">
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">User List</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Ignore User</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Ban User</div>
+            </div>
+          </div>
+          <div className="relative group">
+            <span className="hover:bg-gray-300 px-2 py-1 cursor-pointer">Help</span>
+            <div className="absolute top-full left-0 bg-white border border-gray-400 shadow-lg hidden group-hover:block z-50 min-w-32">
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">About</div>
+              <div className="hover:bg-blue-200 px-3 py-1 cursor-pointer text-xs">Chat Commands</div>
+            </div>
+          </div>
         </div>
       </div>
 
